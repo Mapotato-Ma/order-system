@@ -36,7 +36,7 @@ createServer()
     }
     if (req.url.startsWith('/getMenu')) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(toJSON(getMenu()));
+      res.end(toJSON({ code: 200, message: '获取菜单成功', data: getMenu() }));
       return;
     }
     if (req.url.startsWith('/getOrderByTableNumber')) {
@@ -156,10 +156,10 @@ const payTheBill = ({ tableNumber }, res) => {
     writeData(currentData);
     // 通知这桌人
     orderSubjects.get(String(tableNumber)).next();
-    res.end(toJSON({ code: 200, message: '支付成功' }));
+    res.end(toJSON({ code: 200, message: '支付成功', data: true }));
   } catch (error) {
     console.log('🚀 ~ 支付失败 ~ 154行', error);
-    res.end(toJSON({ code: 400, message: '支付失败' }));
+    res.end(toJSON({ code: 400, message: '支付失败', data: false }));
   }
 };
 

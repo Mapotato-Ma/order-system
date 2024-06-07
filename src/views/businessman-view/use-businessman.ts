@@ -1,12 +1,15 @@
 import { request, sendEvent } from '@/http';
 import { ref } from 'vue';
+import { z } from 'zod';
 
-interface IGrid {
-  name: string;
-  members?: string[];
-  foods?: string[];
-  nonInteractive?: boolean;
-}
+const zGrid = z.object({
+  name: z.string(),
+  members: z.array(z.string()).optional(),
+  foods: z.array(z.string()).optional(),
+  nonInteractive: z.boolean().optional()
+});
+
+type IGrid = z.infer<typeof zGrid>;
 
 export const useBusinessman = () => {
   // 布局
@@ -31,13 +34,18 @@ export const useBusinessman = () => {
     });
   };
 
+  const booleanType = z.boolean();
   // 结账
   const payTheBill = async (tableNumber: number) => {
-    const res = await request('/payTheBill', {
-      method: 'POST',
-      body: JSON.stringify({ tableNumber })
-    });
-    console.log('🚀 ~ res ~ 38行', res);
+    const res = await request<z.infer<typeof booleanType>>(
+      '/payTheBill',
+      {
+        method: 'POST',
+        body: JSON.stringify({ tableNumber })
+      },
+      booleanType
+    );
+    console.log('🚀 ~ 校验通过，业务侧成功拿到数据 ~ 38行', res);
   };
 
   return { grids, getOrders, payTheBill };

@@ -1,17 +1,19 @@
 import { request, sendEvent } from '@/http';
 import { ref } from 'vue';
+import { z } from 'zod';
 
 export const useCustomer = () => {
   const userName = ref();
-  const menu = ref();
+  const menu = ref<z.infer<typeof menuType>>();
   const deskMates = ref<string[]>([]);
   const tableNumber = ref<number>();
   const orderMap = ref<Map<string, number>>(new Map());
 
+  const menuType = z.array(z.string());
   // 获取菜单
   const getMenu = async () => {
-    menu.value = await request('/getMenu');
-    menu.value.forEach((item: any) => {
+    menu.value = await request<z.infer<typeof menuType>>('/getMenu', {}, menuType);
+    menu.value?.forEach((item: any) => {
       orderMap.value.set(item, 0);
     });
   };
